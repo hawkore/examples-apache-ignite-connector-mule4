@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="CacheDataIngestion" doc:id="449aeed9-3d57-4898-90d7-d1d3706b8e58" >
+		<http:listener doc:name="Listener" doc:id="7df44e66-b38e-4655-a7eb-c27e30b93df8" config-ref="HTTP_Listener_config" path="/caches/ingestPois"/>
+		<set-variable value="2" doc:name="numberOfIngesters" doc:id="5b7972cd-a392-4770-8be0-9e2084a9c820" variableName="numberOfIngesters"/>
+		<java:new doc:name="create pois provider" doc:id="a9c6657f-47bc-46c0-94aa-cffd52e8c641" class="com.hawkore.ignite.connector.examples.dataproviders.PoisProvider" constructor="PoisProvider(int, String, int, int) " target="poisProvider">
+			<java:args ><![CDATA[#[{
+      arg0: attributes.queryParams.count  as Number,
+      arg1: attributes.queryParams.cc as String,
+      arg2: attributes.queryParams.initialId as Number,
+	  arg3: vars.numberOfIngesters as Number
+    }]]]></java:args>
+		</java:new>
+		<apache-ignite:cache-ingest-data doc:name="Cache - Ingest data INTO pois cache" doc:id="888751e4-cb05-4b40-9b55-211fa2c5b4b8" config-ref="Apache_Ignite_Config" dataProvider-ref="#[vars.poisProvider]" cache="pois" numberOfIngesters="#[vars.numberOfIngesters]" batchSize="10000"/>
+		<set-payload value='#[output application/json --- payload]' doc:name="Set Payload" doc:id="69043ec5-22bc-4c03-a23e-79c12bd3b710" />
+	</flow>
+	
+	
+</mule>

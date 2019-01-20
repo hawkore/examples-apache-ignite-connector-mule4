@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<flow name="QUEUE1_Listener" doc:id="b12f4651-7020-40b9-a6c7-498fa51d6893" >
+		<apache-ignite:queue-listener queue="QUEUE1" doc:name="Queue - listener - QUEUE1" doc:id="aa99a6c3-daee-462f-aa39-9b6af5b5fff8" config-ref="Apache_Ignite_Config"/>
+		<logger level="INFO" doc:name="Just log receive message" doc:id="7773c8d0-0e56-4705-a3f4-d17f9b66888d" message='#["Message receive on QUEUE1: " ++ (payload as String)]'/>
+		<set-payload value='#["process reveived message on QUEUE1: " ++ payload as String]' doc:name="Set Payload" doc:id="167d1164-6db8-4941-895d-2bd252e41d88" />
+	</flow>
+	<flow name="QUEUE2_Listener" doc:id="9a9a2337-f001-4c78-960c-0fd13bb7a81c" >
+		<apache-ignite:queue-listener queue="QUEUE2" doc:name="Queue - listener - QUEUE2" doc:id="c0409848-c831-498e-88cd-a081e5236ed3" config-ref="Apache_Ignite_Config"/>
+		<apache-ignite:cache-put cache="CACHE2" doc:name="Cache - Put Entity on CACHE2" doc:id="04102575-428f-40b5-ae0f-e5f257d973fe" config-ref="Apache_Ignite_Config" key-ref="#[payload.key]" value-ref="#[payload.data]"/>
+	</flow>
+	<flow name="QueueDataIngestion" doc:id="449aeed9-3d57-4898-90d7-d1d3706b8e58" >
+		<http:listener doc:name="Listener" doc:id="f573cbc6-4423-4270-857f-71e832cb2c1d" config-ref="HTTP_Listener_config" path="/queues/ingestEntities"/>
+		<set-variable value="2" doc:name="numberOfIngesters" doc:id="650572d0-4058-4d98-8b56-638473f28e59" variableName="numberOfIngesters"/>
+		<java:new doc:name="create Entity provider" doc:id="feaf6460-bb7f-418e-a2c5-ff2f629215ea" class="com.hawkore.ignite.connector.examples.dataproviders.EntityProvider" constructor="EntityProvider(int, int, int) " target="entitiesProvider">
+			<java:args ><![CDATA[#[{
+      arg0: attributes.queryParams.count  as Number,
+      arg1: attributes.queryParams.initialId as Number,
+	  arg2: vars.numberOfIngesters as Number
+    }]]]></java:args>
+		</java:new>
+		<apache-ignite:queue-ingest-data queue="QUEUE2" doc:name="Queue - Ingest data into QUEUE2" doc:id="00b32112-26e1-4419-98f3-8f582ad5b527" config-ref="Apache_Ignite_Config" dataProvider-ref="#[vars.entitiesProvider]" numberOfIngesters="#[vars.numberOfIngesters]"/>
+		<set-payload value='#[output application/json --- payload]' doc:name="Set Payload" doc:id="6f1f442e-a8fc-49b2-b8ea-a6bf0a392e35" />
+	</flow>
+	<flow name="queuesFlow" doc:id="35aeb35c-4c69-4a50-8871-756be4bda876" >
+		<http:listener doc:name="Listener" doc:id="f65d8d36-60ba-440c-ac81-4924d8dfab96" config-ref="HTTP_Listener_config" path="/queues/publish"/>
+		<apache-ignite:queue-publish queue="QUEUE1" doc:name="Queue - publish to QUEUE1" doc:id="1463b1bb-f729-4809-922a-5301798b956a" config-ref="Apache_Ignite_Config" item-ref="#[attributes.queryParams.message]"/>
+	</flow>
+	<flow name="queuesFlow1" doc:id="8d77b2bf-2a6f-4c89-bab7-3cfbed320e4d" >
+		<http:listener doc:name="Listener" doc:id="98f1820a-d044-4842-8fc1-8a71ae8375e2" config-ref="HTTP_Listener_config" path="/queues/publishConsume"/>
+		<apache-ignite:queue-publish-consume queue="QUEUE1" doc:name="Queue - publish and consume a message to/from QUEUE1" doc:id="973444b4-aed1-40ea-8e37-bad6a0fccc44" config-ref="Apache_Ignite_Config" item-ref="#[attributes.queryParams.message]"/>
+	</flow>
+</mule>

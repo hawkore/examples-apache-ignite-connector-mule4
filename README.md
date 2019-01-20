@@ -22,8 +22,8 @@ Hi! This is Hawkore's Apache Ignite connector for Mule 4 samples project.
 
 * `ignite-server-node-test`: Start server nodes for testing Hawkore's Apache Ignite connector. See [README.md](ignite-server-node-test/README.md) for more info.
 
-* `examples-mule4-ignite-connector`: Sample mule 4 application for testing [Hawkore's Apache Ignite connector stand-alone
-](https://docs.hawkore.com/private/apache-ignite-connector-standalone/). See [README.md](examples-mule4-ignite-connector/README.md) for more info.
+* `examples-mule4-ignite-connector`: Sample mule 4 application for testing [Hawkore's Apache Ignite connector for Mule 4
+](https://docs.hawkore.com/private/apache-ignite-connector-mule4/). See [README.md](examples-mule4-ignite-connector/README.md) for more info.
 
 # Other resources
 

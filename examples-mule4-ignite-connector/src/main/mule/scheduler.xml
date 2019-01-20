@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<flow name="SchedulerSource" doc:id="962cdf67-5dc7-4b1e-a822-5ee058b86c4f" >
+		<apache-ignite:scheduler-source doc:name="Scheduler - source" doc:id="4df30560-23b1-4fae-9c18-8ee7d3644bb9" config-ref="Apache_Ignite_Config" uniqueSchedulerId="a_scheduler_1" description="My cron scheduler 1">
+			<apache-ignite:scheduler-strategy >
+				<apache-ignite:cron />
+			</apache-ignite:scheduler-strategy>
+		</apache-ignite:scheduler-source>
+		<java:invoke-static doc:name="wait some seconds" doc:id="13603f14-7742-4349-a2ff-ed8b2a359ac4" class="java.lang.Thread" method="sleep(long)">
+			<java:args ><![CDATA[#[
+{
+	arg0:5000
+}
+]]]></java:args>
+		</java:invoke-static>
+		<logger level="INFO" doc:name="Logger" doc:id="ec13d545-2620-46b0-a47d-608d1709148b" message="#['scheduler dispatch this task']"/>
+	</flow>
+	
+	<flow name="schedulerTasks" doc:id="488d28f6-61aa-4df2-9be9-0a9811e8f38e" >
+		<http:listener doc:name="Listener" doc:id="e6976afb-2d1d-423f-b1bd-f18a3c822870" config-ref="HTTP_Listener_config" path="/scheduler/tasks"/>
+		<apache-ignite:scheduler-tasks doc:name="Scheduler - task configs" doc:id="bf02b364-fe58-4d36-862c-63b357780a56" config-ref="Apache_Ignite_Config"/>
+		<set-payload value='#[output application/json --- payload]' doc:name="Set Payload" doc:id="b922f4b5-afd4-4d60-bf3b-2618278b645f" />
+	</flow>
+	<flow name="schedulerExecutions" doc:id="afd166fb-379f-4566-8c9e-6b0d2888c99f" >
+		<http:listener doc:name="Listener" doc:id="dce8024c-c331-44f7-be7b-02da7ca81339" config-ref="HTTP_Listener_config" path="/scheduler/executions"/>
+		<apache-ignite:scheduler-run-list doc:name="Scheduler - run list" doc:id="e4ee817d-1c7c-49f3-9f55-a80ad8233f1f" config-ref="Apache_Ignite_Config" taskId="#[attributes.queryParams.id]"/>
+		<set-payload value='#[output application/json --- payload]' doc:name="Set Payload" doc:id="1febe39e-b229-414e-8900-de2dad8ee8d7" />
+	</flow>
+	<flow name="schedulerStop" doc:id="46553454-fb5b-4d1e-85bb-33099053bade" >
+		<http:listener doc:name="Listener" doc:id="5f750a9b-09a9-478a-9406-bd8808a5f49d" config-ref="HTTP_Listener_config" path="/scheduler/stop"/>
+		<apache-ignite:scheduler-stop doc:name="Scheduler - stop" doc:id="0c729151-d1b5-4c48-b147-a95427ce19d9" config-ref="Apache_Ignite_Config" taskId="#[attributes.queryParams.id]"/>
+		<set-payload value='#["Operation success for scheduler " ++ (attributes.queryParams.id as String)]' doc:name="Set Payload" doc:id="c25d1516-bb0c-4330-8c01-0eb1cabe55ed" />
+	</flow>
+	<flow name="schedulerStart" doc:id="a71cb4c3-0a0f-4369-bd17-c6a8de2a4cc6" >
+		<http:listener doc:name="Listener" doc:id="df049249-727d-4eb9-bfad-eff3294d6e24" config-ref="HTTP_Listener_config" path="/scheduler/start"/>
+		<apache-ignite:scheduler-start doc:name="Scheduler - start" doc:id="272e7980-5ab0-4b88-b47e-844f282f643b" config-ref="Apache_Ignite_Config" taskId="#[attributes.queryParams.id]"/>
+		<set-payload value='#["Operation success for scheduler " ++ (attributes.queryParams.id as String)]' doc:name="Set Payload" doc:id="80e42d7d-4cc3-4b87-abdf-6196120bf718" />
+	</flow>
+	<flow name="schedulerRun" doc:id="d5613c8a-8964-4b64-be3d-92bc611480b4" >
+		<http:listener doc:name="Listener" doc:id="eb1d0cf7-4c05-4b82-a4a5-a27a418dedb7" config-ref="HTTP_Listener_config" path="/scheduler/run"/>
+		<apache-ignite:scheduler-run-now doc:name="Scheduler - run now" doc:id="4d4134c6-da75-4d1a-9d33-a606919159c7" config-ref="Apache_Ignite_Config" taskId="#[attributes.queryParams.id]"/>
+		<set-payload value='#["Operation success for scheduler " ++ (attributes.queryParams.id as String)]' doc:name="Set Payload" doc:id="dd4c8095-08ee-4918-8558-71ba9950034c" />
+	</flow>
+	<flow name="schedulerReschedule" doc:id="3a86309d-6c21-4cb5-8213-29f63395f23d" >
+		<http:listener doc:name="Listener" doc:id="9ddd6fa3-b21b-4c20-8c50-e827ef578895" config-ref="HTTP_Listener_config" path="/scheduler/reschedule"/>
+		<choice doc:name="Choice" doc:id="b05a86f3-f005-42e7-b051-243de6f8f143" >
+			<when expression="#[attributes.queryParams.cron != null]">
+				<apache-ignite:scheduler-reschedule doc:name="Scheduler - CRON reschedule" doc:id="3628d5e4-070d-4027-8f05-34840aeaf07e" config-ref="Apache_Ignite_Config" taskId="#[attributes.queryParams.id]">
+					<apache-ignite:scheduler-strategy >
+						<apache-ignite:cron cronExpression="#[attributes.queryParams.cron as String]" />
+					</apache-ignite:scheduler-strategy>
+				</apache-ignite:scheduler-reschedule>
+			</when>
+			<otherwise >
+				<apache-ignite:scheduler-reschedule doc:name="Scheduler - FIXED FREC reschedule" doc:id="99457b7b-ffd0-4671-bbf5-f72ee0a8908b" config-ref="Apache_Ignite_Config" taskId="#[attributes.queryParams.id]">
+					<apache-ignite:scheduler-strategy >
+						<apache-ignite:fixed-frequency />
+					</apache-ignite:scheduler-strategy>
+				</apache-ignite:scheduler-reschedule>
+			</otherwise>
+		</choice>
+		<set-payload value='#["Operation success for scheduler " ++ (attributes.queryParams.id as String)]' doc:name="Set Payload" doc:id="a57b5f36-54e3-4478-b6ea-ba0ef4c7752b" />
+	</flow>
+</mule>

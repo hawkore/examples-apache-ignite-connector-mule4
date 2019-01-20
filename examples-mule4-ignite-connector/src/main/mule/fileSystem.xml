@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<flow name="fileSystemCreateFile" doc:id="962cdf67-5dc7-4b1e-a822-5ee058b86c4f" >
+		<http:listener doc:name="Listener" doc:id="33ce9ea2-465a-4d45-aa05-ec6eebc1004e" config-ref="HTTP_Listener_config" path="/filesystem/create" allowedMethods="POST"/>
+		<set-variable value="#[write(attributes.queryParams.content as String, 'application/octet-stream')]" doc:name="Create stream content" doc:id="47723000-5c95-490a-84ac-43316cec8875" variableName="content"/>
+		<apache-ignite:filesystem-create fileSystem="MY_IGFS" doc:name="FileSystem - Create" doc:id="7ef834e7-de9f-4510-91f9-501835db09b5" config-ref="Apache_Ignite_Config" content-ref="#[vars.content]" path="#[attributes.queryParams.path]"/>
+		<set-payload value='#["File successfully created!"]' doc:name="Set Payload" doc:id="a97ec248-29ff-496f-acc2-ae0ec4a7994e" mimeType="text/plain"/>
+	</flow>
+	<flow name="fileSystemCreateDirectories" doc:id="4ca7ae80-492e-4125-965f-551832855014" >
+		<http:listener doc:name="Listener" doc:id="2fd2d0f9-fdaa-43af-8448-63ec22cabd28" config-ref="HTTP_Listener_config" path="/filesystem/mkdirs" allowedMethods="POST"/>
+		<apache-ignite:filesystem-mkdirs fileSystem="MY_IGFS" doc:name="FileSystem - Mkdirs" doc:id="d0b062f9-4e46-4b18-b84c-7c7fe8113974" config-ref="Apache_Ignite_Config" path="#[attributes.queryParams.path]"/>
+		<set-payload value='#["Directories successfully created!"]' doc:name="Set Payload" doc:id="2b100acc-a662-4131-ac6b-7c80bfcb1a0d" mimeType="text/plain"/>
+	</flow>	
+	<flow name="fileSystemDownloadFile" doc:id="c9330b79-e7ea-4149-bbb8-243d4667c534" >
+		<http:listener doc:name="Listener" doc:id="f7328864-0a93-4eb1-ba86-13cd47b45316" config-ref="HTTP_Listener_config" path="/filesystem/download" allowedMethods="GET"/>
+		<apache-ignite:filesystem-open doc:name="FileSystem - Open" doc:id="4017afbc-cbf4-4d00-939c-8d82ba5f06d0" config-ref="Apache_Ignite_Config" path="#[attributes.queryParams.path]" fileSystem="MY_IGFS"/>
+	</flow>		
+	<flow name="fileSystemFileSize" doc:id="6f7aea28-da31-4c58-a79a-e05feac876a1" >
+		<http:listener doc:name="Listener" doc:id="acedbcef-cfd5-4fc9-a843-d8d297e9d03f" config-ref="HTTP_Listener_config" path="/filesystem/size" allowedMethods="GET"/>
+		<apache-ignite:filesystem-size fileSystem="MY_IGFS" doc:name="FileSystem - Size" doc:id="c5f80207-43cf-4821-b834-07caf7227934" config-ref="Apache_Ignite_Config" path="#[attributes.queryParams.path]"/>
+		<set-payload value='#[payload]' doc:name="Set Payload" doc:id="56901ace-a708-4540-98f2-ed4b0089a94e" mimeType="text/plain"/>
+	</flow>		
+	<flow name="fileSystemList" doc:id="be20f17e-16ff-4569-b01e-573795382242" >
+		<http:listener doc:name="Listener" doc:id="defd6d5c-e9fe-4e23-9ea3-6ef135738c86" config-ref="HTTP_Listener_config" path="/filesystem/ls" allowedMethods="GET" />
+		<apache-ignite:filesystem-list-files fileSystem="MY_IGFS" doc:name="FileSystem - List files" doc:id="87430fda-9d88-4b36-ad8d-cdf9d24756c4" config-ref="Apache_Ignite_Config" path="#[attributes.queryParams.path]"/>
+		<set-payload value='#[output application/json --- payload]' doc:name="Set Payload" doc:id="b4916e38-5f5a-4bac-8a09-ba4a579bc35e" mimeType="application/json"/>
+	</flow>	
+	<flow name="fileSystemFileDirSummary" doc:id="90209e90-2b13-4554-b9b7-56b62612bf79" >
+		<http:listener doc:name="Listener" doc:id="88b3f92d-71d7-46f4-9eb1-b6b17c397f6c" config-ref="HTTP_Listener_config" path="/filesystem/summary" allowedMethods="GET"/>
+		<apache-ignite:filesystem-summary fileSystem="MY_IGFS" doc:name="FileSystem - Summary" doc:id="bbd58c7a-32ef-4deb-a781-24a4ed120bc9" config-ref="Apache_Ignite_Config" path="#[attributes.queryParams.path]"/>
+		<set-payload value='#[output application/json --- payload]' doc:name="Set Payload" doc:id="628a2d44-c790-4f63-9b6a-0698c320ae1b" mimeType="application/json"/>
+	</flow>	
+	<flow name="fileSystemDeleteFileDir" doc:id="997e8896-9588-4013-acd7-b19792af8ebc" >
+		<http:listener doc:name="Listener" doc:id="abbdf0d4-3b62-4116-b7c1-63b5395bc679" config-ref="HTTP_Listener_config" path="/filesystem/rm" allowedMethods="DELETE"/>
+		<apache-ignite:filesystem-delete fileSystem="MY_IGFS" doc:name="FileSystem - Delete" doc:id="78aec54b-ada8-45c4-95af-99060b4ca0e7" config-ref="Apache_Ignite_Config" path="#[attributes.queryParams.path]" recursive="true"/>
+		<set-payload value='#["Successfully deleted"]' doc:name="Set Payload" doc:id="c9d30045-31bf-4f97-ba73-dbc14ab214c9" mimeType="text/plain"/>
+	</flow>		
+</mule>

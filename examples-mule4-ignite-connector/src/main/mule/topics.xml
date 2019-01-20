@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="topicsFlow" doc:id="2b35da3d-3fce-4811-aeb5-24e1f41fd694" >
+		<apache-ignite:topic-listener topic="TOPIC1" doc:name="Topic - listener" doc:id="bbd5d81a-364a-44bb-8f53-c183f628fbfd" config-ref="Apache_Ignite_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0a701e4e-5f4f-4714-a229-7e2ff9f47b34" message='#["message received on TOPIC1: " ++ payload as String]'/>
+	</flow>
+	<flow name="topicsFlow1" doc:id="2e31e787-0284-4709-af1b-2e10d98b2b11" >
+		<http:listener doc:name="Listener" doc:id="d17cacdd-fb38-4a9b-932d-0b2f51212c83" config-ref="HTTP_Listener_config" path="/topics/publish"/>
+		<apache-ignite:topic-publish topic="TOPIC1" doc:name="Topic - Publish" doc:id="a824528b-4dfc-4a2a-a447-88df4451dbb0" config-ref="Apache_Ignite_Config" item-ref="#[attributes.queryParams.message]"/>
+	</flow>
+</mule>
