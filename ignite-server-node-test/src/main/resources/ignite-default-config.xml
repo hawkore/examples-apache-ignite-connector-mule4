@@ -9,7 +9,7 @@
         http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<!-- Local  IP finder for testing purpose only -->
-    <bean name="LocalIpFinder" id="LocalIpFinder" class="org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder" lazy-init="true">
+    <bean name="LocalIpFinder" id="LocalIpFinder" class="com.hawkore.ignite.spi.discovery.tcp.ipfinder.test.IpFinder" lazy-init="true">
       <property name="shared" value="false" />     
       <property name="addresses">
        <list>

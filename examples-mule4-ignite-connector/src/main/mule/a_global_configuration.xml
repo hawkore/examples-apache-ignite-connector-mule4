@@ -11,11 +11,9 @@ http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/s
 
 	<configuration-properties doc:name="Application Configuration properties" doc:id="d579cd57-b261-4b09-89b8-140194033ecb" file="app.properties" doc:description="Application properties file"/>
 
-	<configuration-properties doc:name="Ignite Configuration properties" doc:id="66801d20-366c-4376-904e-b5b3d421a1a7" file="ignite/client/ignite.node.test.properties" doc:description="We want to load some properties like ignite Instance name"/>
-
 	<spring:config name="Spring_Config" doc:name="Spring Config" doc:id="516d0770-4334-49c8-861e-ddfffe4e0f6f" files="app-spring-beans.xml" />
 
-	<apache-ignite:connection-manager name="Connection_manager" doc:name="Connection manager" doc:id="8a4cc75d-440a-4ca6-87cc-aa559fdd8120" igniteSpringCfgFile="ignite/client/ignite-client-config.xml" connectToRemoteCluster="true" igniteInstanceName="${ignite.this.node.gridname}">
+	<apache-ignite:connection-manager name="Connection_manager" doc:name="Connection manager" doc:id="8a4cc75d-440a-4ca6-87cc-aa559fdd8120" igniteSpringCfgFile="ignite/client/ignite-client-config.xml" connectToRemoteCluster="true" igniteInstanceName="example">
 		<apache-ignite:cache-defs >
 			<apache-ignite:cache-def cacheName="CACHE1" >
 				<apache-ignite:cache-config >

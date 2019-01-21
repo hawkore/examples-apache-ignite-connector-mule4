@@ -9,17 +9,17 @@ http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mul
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="queriesFlow" doc:id="aaf73b1f-654b-4998-89bb-51ef7c096e71" >
 		<http:listener doc:name="Listener" doc:id="156feeb3-7a3a-4e83-81ca-032db4a8f951" config-ref="HTTP_Listener_config" path="/queries/pois/sqlGeoSearch"/>
-<!-- 		<scripting:execute engine="groovy" doc:name="create luceneQuery" doc:id="25d5b25f-c2b5-4929-97ab-68de80a1c270" target="luceneQuery"> -->
-<!-- 			<scripting:code >import static org.hawkore.ignite.lucene.builder.Builder.geoDistance; -->
-<!-- import static org.hawkore.ignite.lucene.builder.Builder.search;  -->
+ 		<scripting:execute engine="groovy" doc:name="create luceneQuery" doc:id="25d5b25f-c2b5-4929-97ab-68de80a1c270" target="luceneQuery"> 
+ 			<scripting:code>import static org.hawkore.ignite.lucene.builder.Builder.geoDistance; 
+import static org.hawkore.ignite.lucene.builder.Builder.search;
 
-<!-- return search().refresh(true) -->
-<!--             .filter(geoDistance(&quot;place&quot;, 40.416775, -3.703790, attributes.queryParams.radius)) -->
-<!--             .sort(geoDistance(&quot;place&quot;, 40.416775, -3.703790)).build(); -->
-<!-- </scripting:code> -->
-<!-- 		</scripting:execute> -->
-		<set-variable value="#['{&quot;filter&quot;:[{&quot;type&quot;:&quot;geo_distance&quot;,&quot;field&quot;:&quot;place&quot;,&quot;latitude&quot;:40.416775,&quot;longitude&quot;:-3.70379,&quot;max_distance&quot;:&quot;'++ (attributes.queryParams.radius as String) ++'&quot;}],&quot;sort&quot;:[{&quot;type&quot;:&quot;geo_distance&quot;,&quot;field&quot;:&quot;place&quot;,&quot;latitude&quot;:40.416775,&quot;longitude&quot;:-3.70379}],&quot;refresh&quot;:true} }']" doc:name="Set luceneQuery" doc:id="90159cd8-86d2-48bb-bf1e-4aa93a669c43" variableName="luceneQuery"/>
-		<apache-ignite:query-sql doc:name="Query - SQL" doc:id="1767edd9-2f97-4e14-be16-ab3272c2251f" config-ref="Apache_Ignite_Config" queryParams-ref="#[[attributes.queryParams.lang as String, attributes.queryParams.lang as String, vars.luceneQuery as String]]">
+return search().refresh(true)
+            .filter(geoDistance(&quot;place&quot;, 40.416775, -3.703790, attributes.queryParams.radius))
+            .sort(geoDistance(&quot;place&quot;, 40.416775, -3.703790)).build();
+</scripting:code>
+		</scripting:execute>
+
+ 		<apache-ignite:query-sql doc:name="Query - SQL" doc:id="1767edd9-2f97-4e14-be16-ab3272c2251f" config-ref="Apache_Ignite_Config" queryParams-ref="#[[attributes.queryParams.lang as String, attributes.queryParams.lang as String, vars.luceneQuery as String]]">
 			<apache-ignite:sql-query >SELECT id,
 countryCode,
 public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name,
