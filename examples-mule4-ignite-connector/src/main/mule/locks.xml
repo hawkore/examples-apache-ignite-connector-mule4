@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+	<flow name="locksGetRunTask" doc:id="5ef2d9e1-7407-443d-997a-4a179514d5d8" >
+		<http:listener doc:name="Listener" doc:id="eae33839-43f9-4f8d-85a2-6a892726fdbe" config-ref="HTTP_Listener_config" path="/locks/runTask" allowedMethods="GET"/>
+		<set-variable value="#[attributes.queryParams.timeout]" doc:name="Set timeout" doc:id="c1cfaca8-7e44-4fc4-9cf8-b6f5b8e00643" variableName="timeout"/>
+		<set-variable value="#[attributes.queryParams.timeUnit]" doc:name="Set timeUnit" doc:id="dacd1edb-40c0-4414-9ab7-fe0dd912f1e2" variableName="timeUnit"/>
+		<apache-ignite:lock-scope doc:name="Lock - Scope" doc:id="e6328543-fad8-4ecd-bd8e-64dafa929bbc" lock="LOCK_1" timeout="#[vars.timeout]" timeoutUnit="#[vars.timeUnit]" manager-ref="Connection_manager">
+			<java:invoke-static doc:name="Wait 10s" doc:id="acaa5958-3cc7-40e5-b2c0-1427535ed8a8" class="java.lang.Thread" method="sleep(long)">
+				<java:args ><![CDATA[#[{
+	arg0:10000
+}]]]></java:args>
+			</java:invoke-static>
+			<set-payload value='{"msg":"process executed with lock acquired!!"}' doc:name="Process Executed" doc:id="93b85e44-f8c3-4bfe-aca3-5b1c3b23ceca" mimeType="application/json"/>
+		</apache-ignite:lock-scope>
+		<apache-ignite:lock-scope doc:name="Lock - Scope" doc:id="261ad160-4590-4ce8-92df-232123f7cd35" lock="LOCK_1" timeout="#[vars.timeout]" timeoutUnit="#[vars.timeUnit]" manager-ref="Connection_manager">
+			<java:invoke-static doc:name="Wait 10s" doc:id="3953539b-93ee-4dd7-ad48-f1c0c927b61f" class="java.lang.Thread" method="sleep(long)">
+				<java:args ><![CDATA[#[{
+	arg0:10000
+}]]]></java:args>
+			</java:invoke-static>
+			<set-payload value='{"msg":"process executed with lock acquired!!"}' doc:name="Process Executed" doc:id="61367fdb-a676-4430-b589-80e621716667" mimeType="application/json"/>
+		</apache-ignite:lock-scope>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1d6aaf5d-531d-4f7e-8e64-d8a0331bc091" >
+				<logger level="ERROR" doc:name="Logger" doc:id="e871024b-c84c-4107-b8db-18c3231e9796" message="Error captured"/>
+				<set-payload value='#[{"msg": error.errorMessage}]' doc:name="Process Error" doc:id="fd34ae15-b9fd-4993-b41f-86e75ec3778d" mimeType="application/json"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

@@ -26,7 +26,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<flow name="fileSystemFileSize" doc:id="6f7aea28-da31-4c58-a79a-e05feac876a1" >
 		<http:listener doc:name="Listener" doc:id="acedbcef-cfd5-4fc9-a843-d8d297e9d03f" config-ref="HTTP_Listener_config" path="/filesystem/size" allowedMethods="GET"/>
 		<apache-ignite:filesystem-size fileSystem="MY_IGFS" doc:name="FileSystem - Size" doc:id="c5f80207-43cf-4821-b834-07caf7227934" config-ref="Apache_Ignite_Config" path="#[attributes.queryParams.path]"/>
-		<set-payload value='#[payload]' doc:name="Set Payload" doc:id="56901ace-a708-4540-98f2-ed4b0089a94e" mimeType="text/plain"/>
+		<set-payload doc:name="Set Payload" doc:id="56901ace-a708-4540-98f2-ed4b0089a94e" mimeType="text/plain" value="#[message.payload as String]"/>
 	</flow>		
 	<flow name="fileSystemList" doc:id="be20f17e-16ff-4569-b01e-573795382242" >
 		<http:listener doc:name="Listener" doc:id="defd6d5c-e9fe-4e23-9ea3-6ef135738c86" config-ref="HTTP_Listener_config" path="/filesystem/ls" allowedMethods="GET" />

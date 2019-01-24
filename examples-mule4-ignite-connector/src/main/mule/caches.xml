@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
 http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="CacheDataIngestion" doc:id="449aeed9-3d57-4898-90d7-d1d3706b8e58" >
+	<flow name="cachesGetDataIngestion" doc:id="449aeed9-3d57-4898-90d7-d1d3706b8e58" >
 		<http:listener doc:name="Listener" doc:id="7df44e66-b38e-4655-a7eb-c27e30b93df8" config-ref="HTTP_Listener_config" path="/caches/ingestPois"/>
 		<set-variable value="2" doc:name="numberOfIngesters" doc:id="5b7972cd-a392-4770-8be0-9e2084a9c820" variableName="numberOfIngesters"/>
 		<java:new doc:name="create pois provider" doc:id="a9c6657f-47bc-46c0-94aa-cffd52e8c641" class="com.hawkore.ignite.connector.examples.dataproviders.PoisProvider" constructor="PoisProvider(int, String, int, int) " target="poisProvider">
@@ -20,6 +20,34 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		</java:new>
 		<apache-ignite:cache-ingest-data doc:name="Cache - Ingest data INTO pois cache" doc:id="888751e4-cb05-4b40-9b55-211fa2c5b4b8" config-ref="Apache_Ignite_Config" dataProvider-ref="#[vars.poisProvider]" cache="pois" numberOfIngesters="#[vars.numberOfIngesters]" batchSize="10000"/>
 		<set-payload value='#[output application/json --- payload]' doc:name="Set Payload" doc:id="69043ec5-22bc-4c03-a23e-79c12bd3b710" />
+	</flow>
+	<flow name="cachesGetSize" doc:id="d86a637c-dc4e-4b5d-9e75-7a9fc7473da5" >
+		<http:listener doc:name="Listener" doc:id="90da00d0-0209-4418-a79e-c229dd2beb3e" config-ref="HTTP_Listener_config" path="/caches/size" allowedMethods="GET"/>
+		<apache-ignite:cache-instance cache="#[attributes.queryParams.cache]" doc:name="Cache - Instance" doc:id="324a4c64-acde-4f14-b191-830eea309791" config-ref="Apache_Ignite_Config"/>
+		<set-payload value="#[payload.size as String]" doc:name="Set Payload" doc:id="3344e5a9-ffe4-499a-bd90-9e096bf23a21" />
+	</flow>
+	<flow name="cachesGetClear" doc:id="1f85fece-8d53-41c0-b2da-29ba834683f9" >
+		<http:listener doc:name="Listener" doc:id="37d5c9d6-4afe-47d5-89ab-682aca1c651a" config-ref="HTTP_Listener_config" path="/caches/clear" allowedMethods="GET"/>
+		<apache-ignite:cache-clear cache="#[attributes.queryParams.cache]" doc:name="Cache - Clear" doc:id="6a96defb-0804-4bc1-b541-84369fa6f141" config-ref="Apache_Ignite_Config"/>
+		<apache-ignite:cache-instance cache="#[attributes.queryParams.cache]" doc:name="Cache - Instance" doc:id="cc1685d6-bf8d-4678-8136-973b923faec1" config-ref="Apache_Ignite_Config"/>
+		<set-payload value="#[payload.size as String]" doc:name="Set Payload" doc:id="c49ac65a-fc48-4b2c-88c7-fc9743a29891" />
+	</flow>
+	<flow name="cachesDeleteDel" doc:id="0ddd5344-9a42-43db-a8a8-eb6dbaae4e3a" >
+		<http:listener doc:name="Listener" doc:id="b73188f8-7b5c-4967-8c87-32bb58a12b56" config-ref="HTTP_Listener_config" path="/caches/del" allowedMethods="DELETE"/>
+		<apache-ignite:cache-remove cache="CACHE2" doc:name="Cache - Remove" doc:id="5832ec36-0b51-468f-886d-fa7dd05eff2b" config-ref="Apache_Ignite_Config" key-ref="#[attributes.queryParams.key]"/>
+		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="f9452504-05f0-4367-885a-f3c729463434" />
+	</flow>
+	<flow name="cachesPutPut" doc:id="f6f19d86-ebef-46d3-b98a-9057170f8947" >
+		<http:listener doc:name="Listener" doc:id="a70c8403-ab7f-4a75-8c8b-afbb7041f7b1" config-ref="HTTP_Listener_config" path="/caches/put" allowedMethods="PUT"/>
+		<apache-ignite:cache-put cache="CACHE2" doc:name="Cache - Put" doc:id="07c0b44b-fd91-4853-9c47-9d019779ffe5" config-ref="Apache_Ignite_Config" key-ref="#[attributes.queryParams.key]" value-ref="#[attributes.queryParams.value]"/>
+		<set-payload value='#[output text/plain
+---
+"Entry stored: key = " ++ attributes.queryParams.key as String ++ ", val= " ++ attributes.queryParams.value as String]' doc:name="Set Payload" doc:id="8ef7a994-9e1d-40ab-b5f7-b1d38e05fa52" />
+	</flow>
+	<flow name="cachesGetGet" doc:id="18cc0ff6-7203-4b91-a1d6-4546f7bbe6d5" >
+		<http:listener doc:name="Listener" doc:id="6190751c-0317-4fc8-8813-6c6e08ba2884" config-ref="HTTP_Listener_config" path="/caches/get" allowedMethods="GET"/>
+		<apache-ignite:cache-get cache="CACHE2" doc:name="Cache - Get" doc:id="64a51087-a72e-4ebc-bbde-a3a1035b18ee" config-ref="Apache_Ignite_Config" key-ref="#[attributes.queryParams.key]"/>
+		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="8090d070-51a9-4918-bde1-43adb88ef080" />
 	</flow>
 	
 	

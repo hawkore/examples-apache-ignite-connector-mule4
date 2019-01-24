@@ -65,6 +65,13 @@
 				<ref bean="ignite_caches_registration" />
 			</list>
 		</property>
+		<property name="fileSystemConfiguration">
+			<list>
+				<bean class="org.apache.ignite.configuration.FileSystemConfiguration">
+					<property name="name" value="MY_IGFS" />
+				</bean>
+			</list>
+		</property>
 		<property name="discoverySpi">
 			<bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
 				<!-- Initial local port to listen to. -->

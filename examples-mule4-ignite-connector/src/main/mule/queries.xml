@@ -7,8 +7,29 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="queriesFlow" doc:id="aaf73b1f-654b-4998-89bb-51ef7c096e71" >
-		<http:listener doc:name="Listener" doc:id="156feeb3-7a3a-4e83-81ca-032db4a8f951" config-ref="HTTP_Listener_config" path="/queries/pois/sqlGeoSearch"/>
+	<flow name="queriesGetPoiByID" doc:id="3beeed15-dbf1-461e-a706-47b3b0acff93" >
+		<http:listener doc:name="Listener" doc:id="a414e7c8-cdf3-4249-bc71-0dfb9ffa73ab" config-ref="HTTP_Listener_config" path="/queries/pois/{ID}" allowedMethods="GET"/>
+		<apache-ignite:query-sql doc:name="create sqlQuery" doc:id="7a477550-7d77-4982-8370-1bd88e926e0d" config-ref="Apache_Ignite_Config" queryParams-ref="#[[attributes.queryParams.lang as String, attributes.queryParams.lang as String, attributes.uriParams.ID]]">
+			<apache-ignite:sql-query >SELECT id,
+countryCode,
+public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name,
+public.hkmv_text(description, ?, public.HKMV_DEFAULT_ISO(description)) as description,
+public.hkmv_text(name, 'iata', null) as iata
+FROM &quot;pois&quot;.poi 
+WHERE id = ?</apache-ignite:sql-query>
+		</apache-ignite:query-sql>
+		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="9f1037d0-e420-41d2-a6b9-5580152ad362" />
+	</flow>
+	<flow name="queriesDeletePoiByID" doc:id="5435e228-a2ba-41d0-8fe3-82bd3746fada" >
+		<http:listener doc:name="Listener" doc:id="a3b581fb-0b57-43b5-a890-885a77e52d47" config-ref="HTTP_Listener_config" allowedMethods="DELETE" path="/queries/pois/{ID}"/>
+		<apache-ignite:query-sql doc:name="create sqlQuery" doc:id="3260c71d-1df8-4ffc-a621-e09ccf677103" config-ref="Apache_Ignite_Config" queryParams-ref="#[[attributes.uriParams.ID]]">
+			<apache-ignite:sql-query >DELETE &quot;pois&quot;.poi 
+WHERE id = ?</apache-ignite:sql-query>
+		</apache-ignite:query-sql>
+		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="ae26af1a-9b12-44d1-9084-a9892d8ef964" />
+	</flow>
+	<flow name="queriesGetPoisByGeoSearch" doc:id="aaf73b1f-654b-4998-89bb-51ef7c096e71" >
+		<http:listener doc:name="Listener" doc:id="156feeb3-7a3a-4e83-81ca-032db4a8f951" config-ref="HTTP_Listener_config" path="/queries/pois/sqlGeoSearch" allowedMethods="GET"/>
  		<scripting:execute engine="groovy" doc:name="create luceneQuery" doc:id="25d5b25f-c2b5-4929-97ab-68de80a1c270" target="luceneQuery"> 
  			<scripting:code>import static org.hawkore.ignite.lucene.builder.Builder.geoDistance; 
 import static org.hawkore.ignite.lucene.builder.Builder.search;
@@ -31,5 +52,35 @@ WHERE lucene = ?</apache-ignite:sql-query>
 			<apache-ignite:page pageNumber="#[attributes.queryParams.pageNumber]" pageSize="#[attributes.queryParams.limit]" />
 		</apache-ignite:query-sql>
 		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="95ddc4d3-6c3f-4966-a97c-495df4cdf4be" />
+	</flow>
+	<flow name="queriesGetPoisByTextSql" doc:id="49b64908-18c0-4500-95c9-d3132e4772b0" >
+		<http:listener doc:name="Listener" doc:id="cc209d68-315a-4c3d-90ac-5df01cdc84ce" config-ref="HTTP_Listener_config" allowedMethods="GET" path="/queries/pois/sqlSearch"/>
+		<apache-ignite:query-sql doc:name="Query - SQL" doc:id="ea47c89d-9bb6-4a05-9c98-842241e5c026" config-ref="Apache_Ignite_Config" queryParams-ref="#[[attributes.queryParams.lang as String, attributes.queryParams.lang as String, attributes.queryParams.query as String]]">
+			<apache-ignite:sql-query >SELECT id,
+countryCode,
+public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name,
+public.hkmv_text(description, ?, public.HKMV_DEFAULT_ISO(description)) as description,
+public.hkmv_text(name, 'iata', null) as iata
+FROM &quot;pois&quot;.poi
+WHERE lucene = ?</apache-ignite:sql-query>
+			<apache-ignite:page pageNumber="#[attributes.queryParams.pageNumber]" pageSize="#[attributes.queryParams.limit]"/>
+		</apache-ignite:query-sql>
+		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="dc669031-8789-4fb2-a964-515c1ba55620" />
+	</flow>
+	<flow name="queriesGetPoisByTextText" doc:id="093986bb-4f8f-4e82-9169-48ba1e460ac8" >
+		<http:listener doc:name="Listener" doc:id="d957bc1d-8945-4395-b61b-916e6456065f" config-ref="HTTP_Listener_config" allowedMethods="GET" path="/queries/pois/textSearch"/>
+		<apache-ignite:query-lucene tableId='"pois".poi' doc:name="Query - Lucene" doc:id="aa60a16d-6029-4e58-a2f3-4d4e6530f214" config-ref="Apache_Ignite_Config" maxResults="#[attributes.queryParams.limit]">
+			<apache-ignite:lucene-query >#[attributes.queryParams.query]</apache-ignite:lucene-query>
+		</apache-ignite:query-lucene>
+		<set-payload value="#[output application/json
+import geometry2WKTString from java!com::hawkore::ignite::cache::serialization::serializers::SerializationManager
+---
+payload map {
+	key: $.key,
+	name: $.name,
+	description: $.description,
+	place: geometry2WKTString($.place) as String,
+	'type': $.'type'
+}]" doc:name="Set Payload" doc:id="952fdeb6-e267-43c8-a932-df75824f39aa" />
 	</flow>
 </mule>

@@ -1,25 +1,15 @@
-## Samples for Hawkore's Apache Ignite connector stand-alone
+## Samples for Hawkore's Apache Ignite connector for Mule 4
 
-TODO - review documentation
-
-This maven project contains sample source code for [Hawkore's Apache Ignite connector stand-alone
-](https://docs.hawkore.com/private/apache-ignite-connector-standalone).
+This maven project contains sample source code for [Hawkore's Apache Ignite connector for Mule 4
+](https://docs.hawkore.com/private/apache-ignite-connector-mule4).
 
 **IMPORTANT**: You must start Apache Ignite Servers before running this samples, as this application starts Apache Ignite as client node. See [README.md](../ignite-server-node-test/README.md) for more info.
 
 ### Steps for testing
 
-- 1. Start as many client nodes as you want (change `nodeName` and `server.port` per client you start). Open a terminal per client and run:
+- 1. Download the latest version of Anypoint Studio 7 and import this project as an `Anypoint Studio project from File System`. After finishing it's compilation, run it as a `Mule Application`.
 
-```
-mvn spring-boot:run -DnodeName=client1 -Dserver.port=8080
-```
-
-```
-mvn spring-boot:run -DnodeName=client2 -Dserver.port=8081
-```
-
-- 2. Test operations with [Postman](https://www.getpostman.com/apps). Open Postman and send below requests (view code for more samples), change port to any started client's one:
+- 2. Test operations with [Postman](https://www.getpostman.com/apps). Open Postman and send below requests (view code for more samples). Change port if you have modified the HTTP Listener Config (Global Configuration):
 
 	- Prepare some data:
 		- Data ingestion into CACHE: GET http://localhost:8080/caches/ingestPois?cc=ES&count=100000&initialId=0
@@ -53,7 +43,7 @@ mvn spring-boot:run -DnodeName=client2 -Dserver.port=8081
 		- start scheduler (use id from scheduled tasks list): POST http://localhost:8080/scheduler/start?id=df042632-3d04-3bea-bc9d-06ad607b92b9
 		- run scheduled task - one shot (use id from scheduled tasks list): POST http://localhost:8080/scheduler/run?id=df042632-3d04-3bea-bc9d-06ad607b92b9
 		- re-schedule (use id from scheduled tasks list) (Fixed frequency dispatch every second, uses default values): POST http://localhost:8080/scheduler/reschedule?id=df042632-3d04-3bea-bc9d-06ad607b92b9
-		- re-schedule (use id from scheduled tasks list) (CRON expression dispatch every minute): POST http://localhost:8080/scheduler/reschedule?id=df042632-3d04-3bea-bc9d-06ad607b92b9&cron=* * * * *
+		- re-schedule (use id from scheduled tasks list) (CRON expression dispatch every minute): POST [http://localhost:8080/scheduler/reschedule?id=df042632-3d04-3bea-bc9d-06ad607b92b9&cron=* * * * *](http://localhost:8080/scheduler/reschedule?id=df042632-3d04-3bea-bc9d-06ad607b92b9&cron=*%20*%20*%20*%20*)
 
 	- Some **lock** operations:	
 		- 1. run task within lock scope (simulated task execution duration 10 seconds): GET http://localhost:8080/locks/runTask?timeout=1&timeUnit=SECONDS					
@@ -62,7 +52,7 @@ mvn spring-boot:run -DnodeName=client2 -Dserver.port=8081
 		- 4. run task waiting until lock is acquired before first task execution finish: GET http://localhost:8080/locks/runTask?timeout=-1&timeUnit=SECONDS
 
 	- Some **filesystem** operations:	
-		- Create file: POST http://localhost:8080/filesystem/create?path=/sample.txt&content=hello world!
+		- Create file: POST [http://localhost:8080/filesystem/create?path=/sample.txt&content=hello world!](http://localhost:8080/filesystem/create?path=/sample.txt&content=hello%20world!)
 		- Create directories: POST http://localhost:8080/filesystem/mkdirs?path=/mydir/mysubdir
 		- Download file: GET http://localhost:8080/filesystem/download?path=/sample.txt
 		- File/directory size (bytes): GET http://localhost:8080/filesystem/size?path=/sample.txt
