@@ -93,4 +93,13 @@ http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/s
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8ce0bb95-6d90-4770-92fd-557bd7bf4ebc" >
 		<http:listener-connection host="0.0.0.0" port="8080" />
 	</http:listener-config>
+	<apache-ignite:cache-scope-strategy name="Cache_scope_strategy" doc:name="Cache scope strategy" doc:id="28581d08-4ac1-4764-b28d-c5662864a691" entryTTL="10" manager-ref="Connection_manager" >
+		<apache-ignite:cache-def cacheName="A_CACHE_FOR_CACHE_SCOPE_STRATEGY" >
+			<apache-ignite:cache-config >
+				<apache-ignite:simple-cache-configuration atomicityMode="TRANSACTIONAL" >
+					<apache-ignite:client-near-cache-eviction-policy maxSize="10" />
+				</apache-ignite:simple-cache-configuration>
+			</apache-ignite:cache-config>
+		</apache-ignite:cache-def>
+	</apache-ignite:cache-scope-strategy>
 </mule>
