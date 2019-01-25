@@ -1,0 +1,180 @@
+<!--
+
+    (c) 2018 HAWKORE, S.L. - All Rights Reserved
+    Unauthorized copying of this file, via any medium is strictly prohibited
+    Proprietary and confidential
+
+    A copy of the license terms has been included with this distribution in the LICENSE.md file.
+    ---
+    Derechos de Autor (C) 2018 HAWKORE, S.L. - Todos los derechos reservados
+    Se prohibe estrictamente la copia sin autorización de este fichero por cualquier medio
+    Propietario y confidencial
+
+    Se incluye una copia de los términos de la licencia en el archivo LICENSE.md en esta distribución.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- JQuery will be required for this demo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
+    
+    <!-- Keep this simple ... define CSS for this simple webpage in the same file -->
+    <link rel="stylesheet" type="text/css" href="css/demo.css"/>
+    <script src="js/demo.js"></script>
+    <script type="text/javascript">
+    
+        var closeHanlder = function() {
+        	errorMessage("Actually 'filesystemClose' is widely used at this demos", "Please try other demos like: filesystemAppend, filesystemCreate, filesystemOpen...");
+            event.preventDefault();
+            test.btn.button('reset');  
+            return false;
+        }
+        
+        $(document).ready( function() {
+
+            var paramFS = { id : "fileSystem", label : "File system with which operate", defaultValue : "igfs" };
+            var paramPathFile = { id : "path", label : "File path", defaultValue : "/example.txt" };
+            var paramPathPath = { id : "path", label : "Directory path", defaultValue : "/" };
+            var paramPath = { id : "path", label : "File or directory path", defaultValue : "/" };
+            var paramProperties = { id : "properties", label : "Properties to set (as a json object)", defaultValue : "{ \"demo\" : \"true\" }" };
+
+
+            getTest('filesystemAppend', null, {
+                title:"File system append", description:"Opens an output stream to an existing file for appending data", 
+                action:"Append", params : 
+                	[ paramFS, paramPathFile,
+                      { id : "content", label : "Content to append", defaultValue : ". Hello again!" }
+                	  ]
+            });
+            
+            getTest('filesystemClose', closeHanlder, {
+                title:"File system close stream", description:"Close a previously opened stream", action:"Close", params : [ paramFS ]
+            });
+            
+            getTest('filesystemCreate', null, {
+                title:"File system create", description:"Creates a file and opens it for writing", 
+                action:"Create", params : 
+                	[ paramFS, paramPathFile,
+                      { id : "bufferSize", label : "Buffer size", defaultValue : "0" },
+                      { id : "blockSize", label : "Block Size", defaultValue : "0" },
+                      { id : "overwrite", label : "Overwrite", defaultValue : "true" },
+                      { id : "affinityKey", label : "AffinityKey", defaultValue : "2098bab2-d454-4602-960b-87df49a6cd9d" },
+                      { id : "replication", label : "Replication", defaultValue : "0" },
+                      paramProperties,
+                      { id : "content", label : "File content", defaultValue : "Hello world!" }
+                	], defPanel: true
+            });
+            
+            getTest('filesystemDelete', null, {
+                title:"File system delete", description:"Delete a given file or directory", 
+                action:"Delete", params : [ paramFS, paramPath, {
+                    id : "recursive", label : "Delete non-empty directories recursively", defaultValue : "true"
+                } ]
+            });
+            
+            getTest('filesystemExists', null, {
+                title:"File system exists", description:"Checks if the specified path exists in the file system", 
+                action:"Exists?", params : [ paramFS, paramPath ]
+            });
+            
+            getTest('filesystemFormat', null, {
+                title:"File system format", description:"Formats the file system removing all existing entries from it", 
+                action:"Format", params : [ paramFS ]
+            });
+            
+            getTest('filesystemInfo', null, {
+                title:"File system info", description:"Gets file information for the specified path", 
+                action:"Info", params : [ paramFS, paramPath ]
+            });
+            
+            getTest('filesystemListFiles', null, {
+                title:"File system list files", description:"Lists files under the specified path", 
+                action:"List files", params : [ paramFS, paramPathPath ]
+            });
+            
+            getTest('filesystemListPaths', null, {
+                title:"File system list paths", description:"Lists file paths under the specified path", 
+                action:"List paths", params : [ paramFS, paramPathPath ]
+            });
+            
+            getTest('filesystemMkdirs', null, {
+                title:"File system make directories", description:"Creates directories under specified path with the specified properties", 
+                action:"Mkdirs", params : [ paramFS, paramPathPath, paramProperties ]
+            });
+            
+            getTest('filesystemOpen', null, {
+                title:"File system open", description:"Opens a file for reading (content is retrieved and stream closed)", 
+                action:"Open", params : [ paramFS, paramPathFile ]
+            });
+            
+            getTest('filesystemRename', null, {
+            	title:"File system rename", description:"Rename an existing file", 
+            	action:"Rename", params :
+            		[
+                     paramFS, {
+                         id : "sourcePath",
+                         label : "Source file path",
+                         defaultValue : "/example.txt"
+                     }, {
+                         id : "destinationPath",
+                         label : "Destination file path",
+                         defaultValue : "/example_renamed.txt"
+                     }
+                     ]
+            });
+            
+            getTest('filesystemSetTimes', null, {
+                title:"File system set times", description:"Sets last access time and last modification time", 
+                action:"Set times", params :
+                    [
+                     paramFS, paramPath, {
+                         id : "modificationTime",
+                         label : "Last modification time to set (epoch clock in milliseconds)",
+                         defaultValue : "1532042374426"
+                     }, {
+                         id : "accessTime",
+                         label : "Last access time to set (epoch clock in milliseconds)",
+                         defaultValue : "1532042375426"
+                     }
+                     ]
+            });
+            
+            getTest('filesystemSize', null, {
+                title:"File system size", description:"Determines size of the file or directory denoted by provided path", 
+                action:"Size", params : [ paramFS, paramPathPath ]
+            }); 
+            
+            getTest('filesystemSummary', null, {
+                title:"File system summary", description:"Gets summary (total number of files, total number of directories and total length) for a given path", 
+                action:"Summary", params : [ paramFS, paramPathPath ]
+            });
+            
+            getTest('filesystemUpdate', null, {
+                title:"File system update", description:"Updates file information for the specified path", 
+                action:"Update", params : [ paramFS, paramPath, paramProperties ]
+            });
+            
+            getTest('filesystemUsedSpaceSize', null, {
+                title:"File system used space size", description:"Gets file system used space in bytes", 
+                action:"Used space size", params : [paramFS]
+            });
+
+            // Triggers the loading spinner for every button that is clicked
+            $('button').click(function(){
+                $(this).button('loading');
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="panel-group" id="accordion">
+        </div>
+    </div>
+</body>
+</html>

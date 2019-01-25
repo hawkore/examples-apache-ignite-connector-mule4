@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd">
+
+	<flow name="filesystemAppend">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemAppend" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemAppend" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<set-variable variableName="inputStream"
+			value="#[%dw 2.0
+import java!com::hawkore::mule::apacheignite::example::rt::Utils
+output application/java
+---
+Utils::stream(payload.content)]"
+			doc:name="var: inputStream" />
+		<apache-ignite:filesystem-append config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" content-ref="#[vars.inputStream]" doc:name="ign: filesystem-append" />
+		<set-payload value="{&quot;res&quot;:&quot;success!&quot;}" mimeType="application/json" doc:name="payload: ok!" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemCreate">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemCreate" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemCreate" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<set-variable variableName="properties"
+			value="#[%dw 2.0
+output application/java
+---
+read(payload.properties, &quot;application/json&quot;)
+]" doc:name="var: obj properties" />
+		<set-variable variableName="inputStream"
+			value="#[%dw 2.0
+import java!com::hawkore::mule::apacheignite::example::rt::Utils
+output application/java
+---
+Utils::stream(payload.content)]"
+			doc:name="var: inputStream" />
+		<apache-ignite:filesystem-create config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" bufferSize="#[payload.bufferSize]" blockSize="#[payload.blockSize]" overwrite="#[payload.overwrite]"
+			affinityKey="#[payload.affinityKey]" replication="#[payload.replication]" content-ref="#[vars.inputStream]" doc:name="ign: filesystem-create"
+			properties-ref="#[vars.properties]" />
+		<set-payload value="{&quot;res&quot;:&quot;success!&quot;}" mimeType="application/json" doc:name="payload: ok!" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemDelete">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemDelete" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemDelete" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-delete config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" recursive="#[payload.recursive]" doc:name="ign: filesystem-delete" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemExists">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemExists" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemExists" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-exists config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-exists" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemFormat">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemFormat" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemFormat" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-format config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			doc:name="ign: filesystem-format" />
+		<set-payload value="{&quot;res&quot;:&quot;success!&quot;}" mimeType="application/json" doc:name="payload: ok!" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemInfo">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemInfo" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemInfo" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-info config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-info" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemListFiles">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemListFiles" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemListFiles" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-list-files config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-list-liles" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemListPaths">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemListPaths" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemListPaths" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-list-paths config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-list-paths" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemMkdirs">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemMkdirs" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemMkdirs" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<set-variable variableName="properties"
+			value="#[%dw 2.0
+output application/java
+---
+read(payload.properties, &quot;application/json&quot;)
+]" doc:name="var: obj properties" />
+		<apache-ignite:filesystem-mkdirs config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-mkdirs" properties-ref="#[vars.properties]" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+&quot;res&quot; : &quot;success!&quot;]"
+			doc:name="payload: ok!" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemOpen">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemOpen" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemOpen" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-open config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-open" target="stream" />
+		<apache-ignite:filesystem-close-stream stream-ref="#[vars.stream]" doc:name="ign: close-stream"
+			config-ref="ignConfig" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+vars.stream
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemRename">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemRename" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemRename" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-rename config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			sourcePath="#[payload.sourcePath]" destinationPath="#[payload.destinationPath]" doc:name="ign: filesystem-open" />
+		<set-payload value="{&quot;res&quot;:&quot;success!&quot;}" mimeType="application/json" doc:name="payload: ok!" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemSetTimes">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemSetTimes" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemSetTimes" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-set-times config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" modificationTime="#[payload.modificationTime]" accessTime="#[payload.accessTime]" doc:name="ign: filesystem-set-times" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+&quot;res&quot; : &quot;success!&quot;]"
+			doc:name="payload: ok!" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemSize">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemSize" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemSize" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-size config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-size" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemSummary">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemSummary" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemSummary" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-summary config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-summary" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemUpdate">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemUpdate" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemUpdate" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<set-variable variableName="properties"
+			value="#[%dw 2.0
+output application/java
+---
+read(payload.properties, &quot;application/json&quot;)
+]" doc:name="var: obj properties" />
+		<apache-ignite:filesystem-update config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			path="#[payload.path]" doc:name="ign: filesystem-update" properties-ref="#[vars.properties]" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+	<flow name="filesystemUsedSpaceSize">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemUsedSpaceSize" allowedMethods="POST"
+			doc:name="http-in: POST /filesystemUsedSpaceSize" outputMimeType="application/json" />
+		<set-payload value="#[%dw 2.0
+output application/java
+---
+payload
+]" doc:name="payload: form-as-map" />
+		<apache-ignite:filesystem-used-space-size config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+			doc:name="ign: filesystem--used-space-size" />
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+payload
+]" doc:name="toJson" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
+				<flow-ref doc:name="exceptionStrategy" name="exceptionStrategy" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+
+</mule>
