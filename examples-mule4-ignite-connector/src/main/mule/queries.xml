@@ -39,9 +39,9 @@ return search().refresh(true)
             .sort(geoDistance(&quot;place&quot;, 40.416775, -3.703790)).build();
 </scripting:code>
 		</scripting:execute>
-
- 		<apache-ignite:query-sql doc:name="Query - SQL" doc:id="1767edd9-2f97-4e14-be16-ab3272c2251f" config-ref="Apache_Ignite_Config" queryParams-ref="#[[attributes.queryParams.lang as String, attributes.queryParams.lang as String, vars.luceneQuery as String]]">
-			<apache-ignite:sql-query >SELECT id,
+		<apache-ignite:cache-scope doc:name="Cache - scope" doc:id="ae54e227-0dcd-4cea-bda2-bffd9df9376a" key-ref='#["sql search " ++ vars.luceneQuery as String ++ attributes.queryParams.lang as String]' strategy-ref="Cache_scope_strategy">
+			<apache-ignite:query-sql doc:name="Query - SQL" doc:id="1767edd9-2f97-4e14-be16-ab3272c2251f" config-ref="Apache_Ignite_Config" queryParams-ref="#[[attributes.queryParams.lang as String, attributes.queryParams.lang as String, vars.luceneQuery as String]]">
+			<apache-ignite:sql-query>SELECT id,
 countryCode,
 public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name,
 public.hkmv_text(description, ?, public.HKMV_DEFAULT_ISO(description)) as description,
@@ -51,6 +51,7 @@ FROM &quot;pois&quot;.poi
 WHERE lucene = ?</apache-ignite:sql-query>
 			<apache-ignite:page pageNumber="#[attributes.queryParams.pageNumber]" pageSize="#[attributes.queryParams.limit]" />
 		</apache-ignite:query-sql>
+		</apache-ignite:cache-scope>
 		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="95ddc4d3-6c3f-4966-a97c-495df4cdf4be" />
 	</flow>
 	<flow name="queriesGetPoisByTextSql" doc:id="49b64908-18c0-4500-95c9-d3132e4772b0" >
