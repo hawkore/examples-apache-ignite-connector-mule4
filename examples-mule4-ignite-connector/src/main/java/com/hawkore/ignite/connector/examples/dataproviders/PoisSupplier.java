@@ -32,7 +32,7 @@ import com.hawkore.ignite.lucene.MultiValueIsoText;
 import com.hawkore.ignite.lucene.MultiValueIsoTextSqlFunctions;
 
 /**
- * PoisProvider
+ * Thread-safe Pois supplier
  * 
  * <p>
  * 
@@ -72,10 +72,14 @@ public class PoisSupplier implements Supplier<Poi> {
         new IgniteBiTuple<Double, Double>(-9.142685, 38.736946));
 
     /**
+     * Constructor
      * 
      * @param poisNumber
+     *            - number of pois to generate
      * @param countryCode
+     *            - country code one of 'ES', 'FR', 'PT'
      * @param initKey
+     *            - initial key
      */
     public PoisSupplier(int poisNumber, String countryCode, int initKey) {
         this.poisNumber = poisNumber;

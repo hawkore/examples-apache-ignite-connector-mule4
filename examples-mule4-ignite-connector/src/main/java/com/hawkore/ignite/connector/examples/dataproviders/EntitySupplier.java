@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import com.hawkore.ignite.examples.entities.simple.Entity;
 
 /**
- * EntityProvider
+ * Thread-safe Entity supplier
  * 
  * <p>
  * 
@@ -43,9 +43,12 @@ public class EntitySupplier implements Supplier<Entity> {
     private static final int LOG_EVERY = 10000;
 
     /**
+     * Constructor
      * 
      * @param count
+     *            - number of entities to generate
      * @param initKey
+     *            - initial id to use
      */
     public EntitySupplier(int count, int initKey) {
         this.count = count;

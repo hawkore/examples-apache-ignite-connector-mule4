@@ -12,76 +12,98 @@ import com.hawkore.ignite.extensions.api.ingestion.ICacheDataProvider;
 import com.hawkore.ignite.extensions.api.ingestion.IngestionProgressNotifier;
 import com.hawkore.ignite.extensions.api.ingestion.IngestionResult;
 
-public class PoisProvider implements ICacheDataProvider<PoiKey, Poi, Poi>{
+/**
+ * 
+ * Thread-safe Cache Data Provider implementation to use on cache's
+ * apache-ignite:cache-ingest-data operation
+ *
+ * @author Manuel Núñez (manuel.nunez@hawkore.com)
+ *
+ *
+ */
+public class PoisProvider implements ICacheDataProvider<PoiKey, Poi, Poi> {
 
-        // thread-safe pois supplier
-        final PoisSupplier poisSupplier;
-        
-        // thread-safe progress notifier
-        final IngestionProgressNotifier progressNotifier ;
+    // thread-safe pois supplier
+    final PoisSupplier poisSupplier;
 
-        
-    	public PoisProvider(int numberOfPois, String countryCode, int initKey, int numberOfIngesters) {
-    		
-    		poisSupplier = new PoisSupplier(numberOfPois, countryCode, initKey);
-    		
-    		progressNotifier = new IngestionProgressNotifier() {
+    // thread-safe progress notifier
+    final IngestionProgressNotifier progressNotifier;
 
-                private IngestionResult result = new IngestionResult();
+    /**
+     * Constructor
+     * 
+     * @param numberOfPois
+     *            - number of pois to generate
+     * @param countryCode
+     *            - country code one of 'ES', 'FR', 'PT'
+     * @param initKey
+     *            - initial key
+     * @param numberOfIngesters
+     *            - number of ingesters that apache-ignite:cache-ingest-data
+     *            operation uses (just to sync IngestionResult when ingestion
+     *            finished )
+     */
+    public PoisProvider(int numberOfPois, String countryCode, int initKey, int numberOfIngesters) {
 
-                private int receivedFinishNotifications = 0;
+        poisSupplier = new PoisSupplier(numberOfPois, countryCode, initKey);
 
-                @Override
-                public synchronized void notify(IngestionResult result) {
-                    
-                    if (result.isFinished()) {
-                        this.result.updateGlobal(this.result.getProcessed() + result.getProcessed(),
-                            this.result.getSent() + result.getSent(),
-                            Math.max(this.result.getElapsedTime(), result.getElapsedTime()));
-                        receivedFinishNotifications++;
-                        if (receivedFinishNotifications == numberOfIngesters) {
-                            this.result.finish();
-                        }
+        progressNotifier = new IngestionProgressNotifier() {
+
+            private IngestionResult result = new IngestionResult();
+
+            private int receivedFinishNotifications = 0;
+
+            @Override
+            public synchronized void notify(IngestionResult result) {
+
+                if (result.isFinished()) {
+                    this.result.updateGlobal(this.result.getProcessed() + result.getProcessed(),
+                        this.result.getSent() + result.getSent(),
+                        Math.max(this.result.getElapsedTime(), result.getElapsedTime()));
+                    receivedFinishNotifications++;
+                    if (receivedFinishNotifications == numberOfIngesters) {
+                        this.result.finish();
                     }
                 }
+            }
 
-                @Override
-                public synchronized IngestionResult getIngestionResult() {
-                    return this.result;
-                }
-            };
-    	}
-        
-        @Override
-        public Supplier<Poi> getDataSupplier() {
-            return poisSupplier;
-        }
+            @Override
+            public synchronized IngestionResult getIngestionResult() {
+                return this.result;
+            }
+        };
+    }
 
-        @Override
-        public Function<Poi, ExpiryPolicy> getExpiryPolicier() {
-            return null;
-        }
+    @Override
+    public Supplier<Poi> getDataSupplier() {
+        return poisSupplier;
+    }
 
-        @Override
-        public Predicate<Poi> getFilter() {
-            // just do not filter input
-            return null;
-        }
+    @Override
+    public Function<Poi, ExpiryPolicy> getExpiryPolicier() {
+        return null;
+    }
 
-        @Override
-        public Function<Poi, PoiKey> getKeyResolver() {
-            // extract key from poi to store into "pois" cache
-            return Poi::getKey;
-        }
+    @Override
+    public Predicate<Poi> getFilter() {
+        // just do not filter input
+        return null;
+    }
 
-        @Override
-        public IngestionProgressNotifier getProgressNotifier() {
-            return progressNotifier;
-        }
+    @Override
+    public Function<Poi, PoiKey> getKeyResolver() {
+        // extract key from poi to store into "pois" cache
+        return Poi::getKey;
+    }
 
-        @Override
-        public Function<Poi, Poi> getTransformer() {
-            // just return poi without transformation
-            return p -> p;
-        }
+    @Override
+    public IngestionProgressNotifier getProgressNotifier() {
+        return progressNotifier;
+    }
+
+    @Override
+    public Function<Poi, Poi> getTransformer() {
+        // just return poi without transformation
+        return p -> p;
+    }
 }

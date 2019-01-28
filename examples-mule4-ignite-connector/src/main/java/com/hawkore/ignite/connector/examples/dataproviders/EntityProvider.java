@@ -9,6 +9,14 @@ import com.hawkore.ignite.extensions.api.ingestion.IQueueDataProvider;
 import com.hawkore.ignite.extensions.api.ingestion.IngestionProgressNotifier;
 import com.hawkore.ignite.extensions.api.ingestion.IngestionResult;
 
+/**
+ * 
+ * Thread-safe Queue Data Provider implementation to use on
+ * apache-ignite:queue-ingest-data operation
+ *
+ * @author Manuel Núñez (manuel.nunez@hawkore.com)
+ *
+ */
 public class EntityProvider implements IQueueDataProvider<Entity, Entity> {
 
     // thread-safe data supplier
@@ -16,10 +24,21 @@ public class EntityProvider implements IQueueDataProvider<Entity, Entity> {
 
     // thread-safe progress notifier
     private final IngestionProgressNotifier progressNotifier;
-    
+
+    /**
+     * 
+     * @param numberOfEntities
+     *            - number of entities to generate
+     * @param initialId
+     *            - initial id to use
+     * @param numberOfIngesters
+     *            - number of ingesters that apache-ignite:queue-ingest-data
+     *            operation uses (just to sync IngestionResult when ingestion
+     *            finished )
+     */
     public EntityProvider(int numberOfEntities, int initialId, int numberOfIngesters) {
         // thread-safe data supplier
-    		dataProvider = new EntitySupplier(numberOfEntities, initialId);
+        dataProvider = new EntitySupplier(numberOfEntities, initialId);
 
         // thread-safe progress notifier
         progressNotifier = new IngestionProgressNotifier() {
@@ -47,7 +66,7 @@ public class EntityProvider implements IQueueDataProvider<Entity, Entity> {
                 return this.result;
             }
         };
-	}
+    }
 
     @Override
     public Supplier<Entity> getDataSupplier() {
@@ -71,5 +90,5 @@ public class EntityProvider implements IQueueDataProvider<Entity, Entity> {
             return p;
         };
     }
-    
+
 }
