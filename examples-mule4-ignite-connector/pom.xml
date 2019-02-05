@@ -22,9 +22,9 @@
 
 		<apache.ignite.connector.version>2.6.0</apache.ignite.connector.version>
 
-		<!-- apache ignite connector comes with ignite 2.4.0 version, on this project 
+		<!-- apache ignite connector comes with ignite 2.4.0 version, on this project
 			we are going to use latest version -->
-		<ignite.version>2.7.0-hk</ignite.version>
+		<ignite.version>2.7.1-hk</ignite.version>
 		<h2.version>1.4.197</h2.version>
 		<lucene.version>7.4.0</lucene.version>
 		<spring.version>5.1.0.RELEASE</spring.version>
@@ -251,7 +251,7 @@
 			<version>${ignite.version}</version>
 		</dependency>
 
-		<!-- Updated Apache ignite extra dependencies to share/update on ignite 
+		<!-- Updated Apache ignite extra dependencies to share/update on ignite
 			plugin -->
 
 		<dependency>
