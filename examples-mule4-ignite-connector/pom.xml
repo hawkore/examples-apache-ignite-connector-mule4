@@ -24,7 +24,7 @@
 
 		<!-- apache ignite connector comes with ignite 2.4.0 version, on this project
 			we are going to use latest version -->
-		<ignite.version>2.7.2-hk</ignite.version>
+		<ignite.version>2.7.3-hk</ignite.version>
 		<h2.version>1.4.197</h2.version>
 		<lucene.version>7.4.0</lucene.version>
 		<spring.version>5.1.0.RELEASE</spring.version>
