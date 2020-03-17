@@ -1,113 +1,123 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Ignite configuration for a mule node -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="
+<?xml version="1.0" encoding="UTF-8"?><!-- Ignite configuration for a mule node -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context.xsd        
+        http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<bean id="placeholderProperties"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-		depends-on="environment">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="ignoreUnresolvablePlaceholders" value="true" />
-		<property name="order" value="1" />
-	</bean>
+  <bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+    depends-on="environment">
+    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+    <property name="order" value="1" />
+  </bean>
 
-	<bean id="ignite_caches_registration" name="ignite_caches_registration"
-		class="com.hawkore.ignite.cache.IgniteCacheLoader">
-		<property name="igniteGridName" value="example" />
-		<property name="startIgniteAfterPropertiesSet" value="false" />
-		<property name="updateEntityConfigsOverCluster" value="true" />
-		<property name="autoLoadCache" value="false" />
-		<property name="parallel" value="4" />
-		<property name="loadCacheConfigurations">
-			<list>
-				<ref bean="poisCache" />
-			</list>
-		</property>
-		<property name="sqlFunctionClasses">
-			<array />
-		</property>
-	</bean>
+  <bean id="ignite_caches_registration" name="ignite_caches_registration"
+    class="com.hawkore.ignite.cache.IgniteCacheLoader">
+    <property name="igniteGridName" value="example" />
+    <property name="startIgniteAfterPropertiesSet" value="false" />
+    <property name="updateEntityConfigsOverCluster" value="true" />
+    <property name="autoLoadCache" value="false" />
+    <property name="parallel" value="4" />
+    <property name="loadCacheConfigurations">
+      <list>
+        <ref bean="poisCache" />
+      </list>
+    </property>
+    <property name="sqlFunctionClasses">
+      <array />
+    </property>
+  </bean>
 
-	<bean id="_defaultCacheConfig" class="org.apache.ignite.configuration.CacheConfiguration">
-		<property name="cacheMode" value="PARTITIONED" />
-		<property name="atomicityMode" value="ATOMIC" />
-		<property name="writeSynchronizationMode" value="PRIMARY_SYNC" />
-		<property name="backups" value="1" />
-		<property name="dataRegionName" value="default" />
-	</bean>
+  <bean id="_defaultCacheConfig" class="org.apache.ignite.configuration.CacheConfiguration">
+    <property name="cacheMode" value="PARTITIONED" />
+    <property name="atomicityMode" value="ATOMIC" />
+    <property name="writeSynchronizationMode" value="PRIMARY_SYNC" />
+    <property name="backups" value="1" />
+    <property name="dataRegionName" value="default" />
+  </bean>
 
-	<bean id="_defaultCollectionConfig" class="org.apache.ignite.configuration.CollectionConfiguration">
-		<property name="atomicityMode" value="ATOMIC" />
-		<property name="backups" value="0" />
-		<property name="collocated" value="true" />
-	</bean>
+  <bean id="_defaultCollectionConfig" class="org.apache.ignite.configuration.CollectionConfiguration">
+    <property name="atomicityMode" value="ATOMIC" />
+    <property name="backups" value="0" />
+    <property name="collocated" value="true" />
+  </bean>
 
-	<bean class="org.apache.ignite.configuration.IgniteConfiguration">
-		<property name="gridName" value="example" />
-		<property name="clientMode" value="true" />
-		<property name="workDirectory"
-			value="${java.io.tmpdir}/clients/exampleMuleClient/work" />
-		<property name="binaryConfiguration">
-			<bean class="org.apache.ignite.configuration.BinaryConfiguration">
-				<property name="compactFooter" value="false" />
-			</bean>
-		</property>
-		<property name="lifecycleBeans">
-			<list>
-				<ref bean="ignite_caches_registration" />
-			</list>
-		</property>
-		<property name="fileSystemConfiguration">
-			<list>
-				<bean class="org.apache.ignite.configuration.FileSystemConfiguration">
-					<property name="name" value="MY_IGFS" />
-				</bean>
-			</list>
-		</property>
-		<property name="discoverySpi">
-			<bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
-				<!-- Initial local port to listen to. -->
-				<property name="localPort" value="45500" />
-				<property name="localAddress" value="127.0.0.1" />
-				<!-- Changing local port range. This is an optional action. -->
-				<property name="localPortRange" value="5" />
-				<property name="ipFinder">
-					<bean name="LocalIpFinder" id="LocalIpFinder"
-						class="com.hawkore.ignite.spi.discovery.tcp.ipfinder.test.IpFinder"
-						lazy-init="true">
-						<property name="shared" value="false" />
-						<property name="addresses">
-							<list>
-								<value>localhost:45500..45505</value>
-							</list>
-						</property>
-					</bean>
-				</property>
-			</bean>
-		</property>
-	</bean>
+  <bean class="org.apache.ignite.configuration.IgniteConfiguration">
+    <property name="gridName" value="example" />
+    <property name="clientMode" value="false" />
+    <property name="peerClassLoadingEnabled" value="false" />
+    <property name="publicThreadPoolSize" value="2" />
+    <property name="systemThreadPoolSize" value="2" />
+    <property name="stripedPoolSize" value="2" />
+    <property name="rebalanceThreadPoolSize" value="1" />
 
-	<!-- Annotation Based Configuration - QueryEntity creation -->
-	<bean id="poisCache" class="org.apache.ignite.configuration.CacheConfiguration">
-		<property name="name" value="pois" />
-		<property name="rebalanceMode" value="ASYNC" />
-		<property name="cacheMode" value="PARTITIONED" />
-		<property name="indexedTypes">
-			<array>
-				<!-- this tuple (key, value) will create a table named poi within "pois" 
-					cache -->
-				<value>com.hawkore.ignite.examples.entities.pois.PoiKey</value>
-				<value>com.hawkore.ignite.examples.entities.pois.Poi</value>
-			</array>
-		</property>
-	</bean>
+    <property name="failureDetectionTimeout" value="10000" />
+    <property name="segmentationPolicy" value="RESTART_JVM" />
+    <property name="segmentationResolveAttempts" value="5" />
+
+    <property name="metricsLogFrequency" value="0" />
+
+    <property name="workDirectory" value="${java.io.tmpdir}/clients/exampleMuleClient/work" />
+
+    <property name="lifecycleBeans">
+      <list>
+        <ref bean="ignite_caches_registration" />
+      </list>
+    </property>
+
+    <property name="fileSystemConfiguration">
+      <list>
+        <bean class="org.apache.ignite.configuration.FileSystemConfiguration">
+          <property name="name" value="MY_IGFS" />
+        </bean>
+      </list>
+    </property>
+
+    <property name="discoverySpi">
+      <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+        <!-- Initial local port to listen to. -->
+        <property name="localPort" value="45500" />
+        <property name="localAddress" value="127.0.0.1" />
+        <!-- Changing local port range. This is an optional action. -->
+        <property name="localPortRange" value="5" />
+        <property name="ipFinder">
+          <bean name="LocalIpFinder" id="LocalIpFinder"
+            class="com.hawkore.ignite.spi.discovery.tcp.ipfinder.test.IpFinder" lazy-init="true">
+            <property name="shared" value="false" />
+            <property name="addresses">
+              <list>
+                <value>127.0.0.1:45500..45505</value>
+              </list>
+            </property>
+          </bean>
+        </property>
+      </bean>
+    </property>
+
+    <property name="gridLogger">
+      <bean class="org.apache.ignite.logger.slf4j.Slf4jLogger" />
+    </property>
+
+  </bean>
+
+  <!-- Annotation Based Configuration - QueryEntity creation -->
+  <bean id="poisCache" class="org.apache.ignite.configuration.CacheConfiguration">
+    <property name="name" value="pois" />
+    <property name="rebalanceMode" value="ASYNC" />
+    <property name="cacheMode" value="PARTITIONED" />
+    <property name="indexedTypes">
+      <array>
+        <!-- this tuple (key, value) will create a table named poi within "pois"
+          cache -->
+        <value>com.hawkore.ignite.examples.entities.pois.PoiKey</value>
+        <value>com.hawkore.ignite.examples.entities.pois.Poi</value>
+      </array>
+    </property>
+  </bean>
 
 </beans>

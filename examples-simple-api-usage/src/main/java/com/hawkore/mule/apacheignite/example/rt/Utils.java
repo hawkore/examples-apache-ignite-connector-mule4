@@ -3,11 +3,13 @@ package com.hawkore.mule.apacheignite.example.rt;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Utils {
     
-    private static final Logger logger = Logger.getLogger(Utils.class);
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public static InputStream stream(String s) {
         return new ByteArrayInputStream(s.getBytes());

@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Configuration>
 
-    <!--These are some of the loggers you can enable. 
-        There are several more you can find in the documentation. 
+    <!--These are some of the loggers you can enable.
+        There are several more you can find in the documentation.
         Besides this log4j configuration, you can also use Java VM environment variables
-        to enable other logs like network (-Djavax.net.debug=ssl or all) and 
-        Garbage Collector (-XX:+PrintGC). These will be append to the console, so you will 
+        to enable other logs like network (-Djavax.net.debug=ssl or all) and
+        Garbage Collector (-XX:+PrintGC). These will be append to the console, so you will
         see them in the mule_ee.log file. -->
 
     <Appenders>
-        <RollingFile name="file" fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}example-mule4-ignite-connector.log" 
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} %highlight{${LOG_LEVEL_PATTERN:-%5p} [mule-runtime-embeded]}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue} %style{${sys:PID}}{magenta} --- [%15t] %style{%-40.40c{1.}}{cyan} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%ex}"/>
+        </Console>
+        <RollingFile name="file" fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}example-mule4-ignite-connector.log"
                  filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}example-mule4-ignite-connector-%i.log">
             <PatternLayout pattern="%-5p %d [%t] %X{correlationId}%c: %m%n" />
             <SizeBasedTriggeringPolicy size="10 MB" />
@@ -17,23 +20,22 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        
+
         <!-- Http Logger shows wire traffic on DEBUG. -->
         <!--AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="DEBUG" /-->
         <AsyncLogger name="org.mule.service.http" level="WARN"/>
         <AsyncLogger name="org.mule.extension.http" level="WARN"/>
-    
-        <!-- Mule classes -->        
+
+        <!-- Mule classes -->
         <AsyncLogger name="org.mule" level="INFO"/>
         <AsyncLogger name="com.mulesoft" level="INFO"/>
- 
-        <AsyncLogger name="com.hawkore.mule.extensions" level="DEBUG"/>
 
-        <AsyncLogger name="com.hawkore.ignite.extensions" level="DEBUG"/>
+        <AsyncLogger name="com.hawkore.mule.extensions" level="INFO"/>
+        <AsyncLogger name="com.hawkore.ignite.extensions" level="INFO"/>
 
- 
         <AsyncRoot level="INFO">
             <AppenderRef ref="file" />
+            <AppenderRef ref="Console" />
         </AsyncRoot>
     </Loggers>
 </Configuration>

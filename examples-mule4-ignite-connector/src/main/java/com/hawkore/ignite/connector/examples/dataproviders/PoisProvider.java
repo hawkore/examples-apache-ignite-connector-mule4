@@ -79,7 +79,8 @@ public class PoisProvider implements ICacheDataProvider<PoiKey, Poi, Poi> {
         return poisSupplier;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Function<Poi, ExpiryPolicy> getExpiryPolicier() {
         return null;
     }

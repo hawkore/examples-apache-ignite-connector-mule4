@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java"
 	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
-http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 	<flow name="cachesGetDataIngestion" doc:id="449aeed9-3d57-4898-90d7-d1d3706b8e58" >
 		<http:listener doc:name="Listener" doc:id="7df44e66-b38e-4655-a7eb-c27e30b93df8" config-ref="HTTP_Listener_config" path="/caches/ingestPois"/>
 		<set-variable value="2" doc:name="numberOfIngesters" doc:id="5b7972cd-a392-4770-8be0-9e2084a9c820" variableName="numberOfIngesters"/>
@@ -49,6 +48,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<apache-ignite:cache-get cache="CACHE2" doc:name="Cache - Get" doc:id="64a51087-a72e-4ebc-bbde-a3a1035b18ee" config-ref="Apache_Ignite_Config" key-ref="#[attributes.queryParams.key]"/>
 		<set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="8090d070-51a9-4918-bde1-43adb88ef080" />
 	</flow>
-	
-	
+
+
 </mule>

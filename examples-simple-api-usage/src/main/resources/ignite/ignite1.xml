@@ -21,25 +21,16 @@
 
 		<property name="gridName" value="grid1" />
 		<property name="clientMode" value="false" />
-		<property name="workDirectory" value="${user.dir}/target/work" />
+		<property name="workDirectory" value="${user.dir}/grid1/work" />
 
+		<property name="metricsLogFrequency" value="0" />
 
-<!-- 		<property name="gridLogger"> -->
-<!-- 			<bean class="org.apache.ignite.logger.slf4j.Slf4jLogger" /> -->
-<!-- 		</property> -->
+ 		<property name="gridLogger">
+ 			<bean class="org.apache.ignite.logger.slf4j.Slf4jLogger" />
+ 		</property>
 
 		<property name="cacheConfiguration">
 			<list>
-				<bean class="org.apache.ignite.configuration.CacheConfiguration">
-                    <property name="name" value="default" />
-					<property name="cacheMode" value="PARTITIONED" />
-					<property name="indexedTypes">
-						<array>
-							<value>java.lang.String</value>
-							<value>java.lang.String</value>
-						</array>
-					</property>
-				</bean>
 				<bean class="org.apache.ignite.configuration.CacheConfiguration">
 					<property name="name" value="CACHE1" />
 					<property name="cacheMode" value="PARTITIONED" />
@@ -53,27 +44,6 @@
 					</property>
 				</bean>
 			</list>
-		</property>
-
-		<property name="cacheKeyConfiguration">
-			<list>
-				<bean class="org.apache.ignite.cache.CacheKeyConfiguration">
-					<property name="typeName"
-						value="com.hawkore.ignite.cache.affinity.AffinityKey" />
-					<property name="affinityKeyFieldName" value="affKey" />
-				</bean>
-				<bean class="org.apache.ignite.cache.CacheKeyConfiguration">
-					<property name="typeName"
-						value="org.apache.ignite.cache.affinity.AffinityKey" />
-					<property name="affinityKeyFieldName" value="affKey" />
-				</bean>
-			</list>
-		</property>
-
-		<property name="binaryConfiguration">
-			<bean class="org.apache.ignite.configuration.BinaryConfiguration">
-				<property name="compactFooter" value="false" />
-			</bean>
 		</property>
 
 		<property name="dataStorageConfiguration">
@@ -98,12 +68,21 @@
 
 		<property name="discoverySpi">
 			<bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
-				<property name="localPort" value="45500" />
-				<property name="localPortRange" value="999" />
+				<!-- Initial local port to listen to. -->
+				<property name="localPort" value="47500" />
+				<property name="localAddress" value="127.0.0.1" />
+				<!-- Changing local port range. This is an optional action. -->
+				<property name="localPortRange" value="5" />
 				<property name="ipFinder">
-                    <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder">
-                        <property name="shared" value="true"/>
-                    </bean>
+					<bean name="LocalIpFinder" id="LocalIpFinder"
+						class="com.hawkore.ignite.spi.discovery.tcp.ipfinder.test.IpFinder" lazy-init="true">
+						<property name="shared" value="false" />
+						<property name="addresses">
+							<list>
+								<value>127.0.0.1:47500..47505</value>
+							</list>
+						</property>
+					</bean>
 				</property>
 			</bean>
 		</property>
@@ -131,7 +110,7 @@
 		<property name="backups" value="1" />
 		<property name="collocated" value="true" />
 	</bean>
-	
+
 	<bean id="_defaultObjectStoreConfig" class="org.apache.ignite.configuration.CacheConfiguration">
 		<property name="cacheMode" value="PARTITIONED" />
 		<property name="atomicityMode" value="ATOMIC" />

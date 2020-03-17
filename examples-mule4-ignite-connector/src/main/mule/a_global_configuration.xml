@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:spring="http://www.mulesoft.org/schema/mule/spring" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:java="http://www.mulesoft.org/schema/mule/java"
-	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:sqs-ex="http://www.mulesoft.org/schema/mule/sqs-ex"
+	xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
+	xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
 http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
+http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+http://www.mulesoft.org/schema/mule/sqs-ex http://www.mulesoft.org/schema/mule/sqs-ex/current/mule-sqs-ex.xsd">
 
 	<configuration-properties doc:name="Application Configuration properties" doc:id="d579cd57-b261-4b09-89b8-140194033ecb" file="app.properties" doc:description="Application properties file"/>
 
 	<spring:config name="Spring_Config" doc:name="Spring Config" doc:id="516d0770-4334-49c8-861e-ddfffe4e0f6f" files="app-spring-beans.xml" />
 
-	<apache-ignite:connection-manager name="Connection_manager" doc:name="Connection manager" doc:id="8a4cc75d-440a-4ca6-87cc-aa559fdd8120" igniteSpringCfgFile="ignite/client/ignite-client-config.xml" connectToRemoteCluster="true" igniteInstanceName="example">
+	<apache-ignite:connection-manager name="Connection_manager" doc:name="Connection manager" doc:id="8a4cc75d-440a-4ca6-87cc-aa559fdd8120" igniteSpringCfgFile="ignite/client/ignite-client-config.xml" igniteInstanceName="example">
 		<apache-ignite:cache-defs >
 			<apache-ignite:cache-def cacheName="CACHE1" >
 				<apache-ignite:cache-config >
@@ -97,7 +97,7 @@ http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/s
 		<apache-ignite:cache-def cacheName="A_CACHE_FOR_CACHE_SCOPE_STRATEGY" >
 			<apache-ignite:cache-config >
 				<apache-ignite:simple-cache-configuration atomicityMode="TRANSACTIONAL" >
-					<apache-ignite:client-near-cache-eviction-policy maxSize="10" />
+					<apache-ignite:server-near-cache-eviction-policy maxSize="10" evictionPolicy="FIFO_EVICTION_POLICY" />
 				</apache-ignite:simple-cache-configuration>
 			</apache-ignite:cache-config>
 		</apache-ignite:cache-def>
