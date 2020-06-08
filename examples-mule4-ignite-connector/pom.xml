@@ -21,7 +21,7 @@
     <app.runtime>4.2.2</app.runtime>
     <mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
 
-    <apache.ignite.connector.version>2.6.1</apache.ignite.connector.version>
+    <apache.ignite.connector.version>2.7.0</apache.ignite.connector.version>
 
     <!-- we will use Hawkore's Apache Ignite version with advanced indexing support -->
     <ignite.version>2.7.6-hk</ignite.version>

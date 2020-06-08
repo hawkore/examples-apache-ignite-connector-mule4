@@ -4,13 +4,13 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
 	xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd">
 
 	<flow name="schedulerSource">
 		<apache-ignite:scheduler-source config-ref="ignConfig" description="Demo scheduler source"
-			uniqueSchedulerId="demoSchedulerSource" activeOnStart="false" concurrencyAllowed="false" doc:name="ign: queue-instance">
+			activeOnStart="false" concurrencyAllowed="false" doc:name="ign: queue-instance">
 			<apache-ignite:scheduler-strategy>
 				<apache-ignite:fixed-frequency frequency="100" startDelay="0" />
 			</apache-ignite:scheduler-strategy>

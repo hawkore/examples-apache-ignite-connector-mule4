@@ -6,7 +6,7 @@ connector operation arguments (most of them).
 
 ## Start demo
 
-Open the project with Anypoint Studio and launch it (run or debug).
+Open the project with Anypoint Studio 7.5+ and launch it (run or debug).
 
 Open the demo [welcome page](http://localhost:8081/view/)
 
@@ -14,5 +14,5 @@ Open the demo [welcome page](http://localhost:8081/view/)
 
 Sign up at [www.hawkore.com](https://www.hawkore.com) to access full documentation.
 
-- [Product documentation](https://docs.hawkore.com/private/apache-ignite-connector-mule3/)
+- [Product documentation](https://docs.hawkore.com/private/apache-ignite-connector-mule4/)
 - [Tutorials](https://docs.hawkore.com/private/tutorials/)

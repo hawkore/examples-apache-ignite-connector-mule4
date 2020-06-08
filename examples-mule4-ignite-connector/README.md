@@ -7,7 +7,7 @@ This maven project contains sample source code for [Hawkore's Apache Ignite conn
 
 ### Steps for testing
 
-- 1. Download the latest version of Anypoint Studio 7 and import this project as an `Anypoint Studio project from File System`. After finishing it's compilation, run it as a `Mule Application`.
+- 1. Download the latest version of Anypoint Studio 7.5+ and import this project as an `Anypoint Studio project from File System`. After finishing it's compilation, run it as a `Mule Application`.
 
 - 2. Test operations with [Postman](https://www.getpostman.com/apps). 
 

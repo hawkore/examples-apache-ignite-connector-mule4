@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema
 http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
 	<flow name="SchedulerSource" doc:id="962cdf67-5dc7-4b1e-a822-5ee058b86c4f" >
-		<apache-ignite:scheduler-source doc:name="Scheduler - source" doc:id="4df30560-23b1-4fae-9c18-8ee7d3644bb9" config-ref="Apache_Ignite_Config" uniqueSchedulerId="a_scheduler_1" description="My cron scheduler 1">
+		<apache-ignite:scheduler-source doc:name="Scheduler - source" doc:id="4df30560-23b1-4fae-9c18-8ee7d3644bb9" config-ref="Apache_Ignite_Config" description="My cron scheduler 1">
 			<apache-ignite:scheduler-strategy >
 				<apache-ignite:cron />
 			</apache-ignite:scheduler-strategy>
