@@ -16,19 +16,19 @@ public class HawkoreEmployee implements Serializable {
 
     @QuerySqlField(index = true, descending = false)
     @QueryTextField
-    private final String id;
+    private String id;
     @QuerySqlField(index = true)
     @QueryTextField
-    private final String name;
+    private String name;
     @QuerySqlField(index = true)
     @QueryTextField
-    private final String surname;
+    private String surname;
     @QuerySqlField(index = true)
     @QueryTextField
-    private final String email;
+    private String email;
     @QuerySqlField(index = true)
     @QueryTextField
-    private final String jobTitle;
+    private String jobTitle;
 
     // Constructors
 

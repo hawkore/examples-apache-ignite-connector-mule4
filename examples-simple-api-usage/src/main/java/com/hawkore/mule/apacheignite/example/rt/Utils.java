@@ -2,10 +2,11 @@ package com.hawkore.mule.apacheignite.example.rt;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class Utils {
     
@@ -22,8 +23,13 @@ public class Utils {
         return "ok";
     }
 
-    public static boolean isIllegalStateException(final org.mule.runtime.api.message.Error e) {
-        return e != null && e.getDescription() != null && e.getDescription().contains("ForcedFailException");
+    public static boolean isIllegalStateException(final Object e) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+        
+    	Class errorClass = Class.forName("org.mule.runtime.api.message.Error");
+    	
+    	Method descMethod = errorClass.getMethod("getDescription");
+    	
+    	return e != null && descMethod.invoke(e) != null && ((String)descMethod.invoke(e)).contains("ForcedFailException");
     }
 
     public static String sleep(long millis) throws InterruptedException {
