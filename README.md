@@ -1,4 +1,4 @@
-# Hawkore's Apache Ignite connector for Mule 4
+# Connect Apache Ignite with Mule 4
 
 _[Apache Ignite®](https://ignite.apache.org) is a memory-centric distributed database, caching, and processing platform for
 transactional, analytical, and streaming workloads, delivering in-memory speeds at petabyte scale._
